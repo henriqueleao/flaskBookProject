@@ -9,6 +9,7 @@ from wtforms import StringField, SubmitField
 from wtforms.validators import InputRequired
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, Integer, String
+from flask_migrate import Migrate
 import sqlalchemy.dialects.sqlite
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -21,6 +22,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 moment = Moment(app)
 bootstrap = Bootstrap(app)
+migrate =Migrate(app,db)
 
 class Role(db.Model):
     __tablename__  = 'roles'
@@ -49,13 +51,22 @@ class NameForm(FlaskForm):
 def index():
     form = NameForm()
     if form.validate_on_submit():
-        old_name = session.get('name')
-        if old_name is not None and old_name != form.name.data:
-            flash('Looks like you have changed your name!')
+        user = User.query.filter_by(username=form.name.data).first()
+        if user is None:
+            user = User(username = form.name.data)
+            db.session.add(user)
+            session['know'] = False
+        else:
+            session['know'] = True
         session['name'] = form.name.data
         form.name.data = ''
         return redirect(url_for('index'))
-    return render_template('index.html',form=form, name=session.get('name'))
+    return render_template(
+        'index.html',
+        form=form,
+        name=session.get('name'),
+        know = session.get('known',False)
+    )
 
 @app.route('/user/<name>')
 def user(name):

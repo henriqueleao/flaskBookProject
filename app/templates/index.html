@@ -3,12 +3,27 @@
 {% block title %}Flasky{% endblock %}
 {% block page_content %}
 <div class="page-header">
-    <h1>Hello, {% if name %}{{ name }}{% else %}Stranger{% endif %}!</h1>
+    <h1>
+        Hello,
+        {% if current_user.is_authenticated %}
+            {{ current_user.username }}
+        {% else %}
+            Stranger
+        {% endif %}!
+    </h1>
     {% if not know%}
     <p>Please to meet you!</p>
     {% else %}
     <p>Happy to see you again</p>
     {% endif %}
 </div>
-{{ wtf.quick_form(form) }}
+{% if form %}
+    <form class="form form-horizontal" method="post" role="form">
+      {{ form.hidden_tag() }}
+      {{ wtf.form_errors(form, hiddens="only") }}
+
+      {{ wtf.form_field(form.name) }}
+      {{ wtf.form_field(form.submit) }}
+    </form>
+{% endif %}
 {% endblock %}

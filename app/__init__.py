@@ -5,12 +5,13 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from config import config
 from flask_login import LoginManager
-
+from flask_wtf import CSRFProtect
 
 bootstrap = Bootstrap()
 moment = Moment()
 db = SQLAlchemy()
 login_manager = LoginManager()
+csrf  = CSRFProtect()
 login_manager.session_protection = 'strong'
 login_manager.login_view = 'auth.login'
 
@@ -24,6 +25,7 @@ def create_app(config_name):
     moment.init_app(app)
     db.app = app
     db.init_app(app)
+    csrf.init_app(app)
     migrate = Migrate(app,db)
 
     from .main import main as main_blueprint

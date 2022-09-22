@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Boolean
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
@@ -12,9 +12,9 @@ class Role(db.Model):
     __tablename__  = 'roles'
     id = Column(Integer, primary_key=True)
     name = Column(String(64), unique=True)
-    default = db.Column(String(64), unique=True, index=True)
+    default = db.Column(Boolean, default=False)
     permissions = db.Column(Integer)
-    users = db.relationship('User', backref='role')
+    users = db.relationship('User', backref='role', lazy='dynamic')
 
     def __repr__(self):
         return '<Role %r>' % self.name

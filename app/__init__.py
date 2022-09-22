@@ -26,7 +26,7 @@ def create_app(config_name):
     db.app = app
     db.init_app(app)
     csrf.init_app(app)
-    migrate = Migrate(app,db)
+    migrate = Migrate(app,db, render_as_batch=True)
 
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
